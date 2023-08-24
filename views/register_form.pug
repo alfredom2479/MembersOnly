@@ -1,0 +1,10 @@
+extends layout 
+
+block content 
+  h1=title 
+
+  form(method='POST' action='')
+    .form-group 
+      label(for='first_name') First Name: 
+      input#first_name.form-control(type='text' placeholder='First Name' name='first_name' required='true')
+      label(for='last_name') Last Name: 
