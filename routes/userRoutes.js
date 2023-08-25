@@ -19,10 +19,15 @@ router.post("/login",(req,res,next)=>{
 //REGISTER 
 
 router.get("/register", (req,res,next)=>{
-  res.send("get register form");
+  res.render('register_form',{
+    title: 'Register!'
+  });
+  //res.send("get register form");
 });
 
 router.post("/register", (req,res,next) =>{
+  
+  console.log(req.body);
   res.send("register user");
 });
 
@@ -45,3 +50,5 @@ router.get("/join", (req,res,next)=>{
 router.post("/join", (req,res,next)=>{
   res.send("join club if code is right");
 });
+
+module.exports = router;
