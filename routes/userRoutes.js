@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const userController = require("../controllers/userController");
+
 router.get("/",(req,res,next)=>{
   //res.redirect("/register");
   res.send("if logged in, send to logout. else, to login");
@@ -18,19 +20,15 @@ router.post("/login",(req,res,next)=>{
 
 //REGISTER 
 
-router.get("/register", (req,res,next)=>{
-  res.render('register_form',{
-    title: 'Register!'
-  });
-  //res.send("get register form");
-});
+router.get("/register", userController.getRegisterUser);
 
-router.post("/register", (req,res,next) =>{
+router.post("/register",userController.postRegisterUser);
+/*router.post("/register", (req,res,next) =>{
   
   console.log(req.body);
   res.send("register user");
 });
-
+*/
 //LOGOUT
 
 router.get("/logout",(req,res,next)=>{

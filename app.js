@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname,'public')));
 app.use("/user",userRoutes);
 app.use("messages",messageRoutes);
 app.use("/", indexRoutes);
-app.use('*',(req,res)=> res.redirect('/messaages'));
+//app.use('*',(req,res)=> res.redirect('/messaages'));
 
 
 app.use(errorHandler);
