@@ -5,48 +5,65 @@ const userController = require("../controllers/userController");
 
 router.get("/",(req,res,next)=>{
   //res.redirect("/register");
-  res.send("if logged in, send to logout. else, to login");
+  res.send("if logged in, send to allmessages. else, to register");
 });
 
-//LOGIN
 
-router.get("/login",(req,res,next)=>{
-  res.send(" get login form");
-});
-
-router.post("/login",(req,res,next)=>{
-  res.send("login user");
-});
 
 //REGISTER 
 
-router.get("/register", userController.getRegisterUser);
+router.get("/register", (req,res,next)=>{
+  if(req.isAuthenticated()){
+    //res.send("already logged in. Log Out to register new account");
+    res.redirect("/user/logout")
+  }
+  else{
+  userController.getRegisterUser(req,res,next);
+  }
+});
 
 router.post("/register",userController.postRegisterUser);
-/*router.post("/register", (req,res,next) =>{
-  
-  console.log(req.body);
-  res.send("register user");
+
+//LOGIN
+
+router.get("/login", (req,res,next)=>{
+  if(req.isAuthenticated()){
+    //res.send("already logged in. Log Out to log into another account");
+    res.redirect("/user/logout");
+  }
+  else{
+  userController.getLoginUser(req,res,next);
+  }
 });
-*/
+
+router.post("/login", userController.postLoginUser);
+
 //LOGOUT
 
-router.get("/logout",(req,res,next)=>{
-  res.send("get logout confirmation form");
+router.get("/logout", (req,res,next)=>{
+  if(!req.isAuthenticated()){
+    //res.send("You are not logged in.")
+    res.redirect("/user/login");
+  }
+  else{
+    userController.getLogoutUser(req,res,next);
+  }
 });
 
-router.post("logout",(req,res,next)=>{
-  res.send("logout user");
-});
+router.post("/logout", userController.postLogoutUser);
 
 //JOIN PRIVATE CLUB
 
 router.get("/join", (req,res,next)=>{
-  res.send("get join club form");
+  if(!req.isAuthenticated()){
+    //res.send("You must be logged in to join the club");
+    res.redirect('/user/login');
+  }
+  else{
+  userController.getJoinUser(req,res,next);
+  }
 });
 
-router.post("/join", (req,res,next)=>{
-  res.send("join club if code is right");
-});
+router.post("/join", userController.postJoinUser);
 
 module.exports = router;

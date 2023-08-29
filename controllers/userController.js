@@ -2,11 +2,18 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const {body, validationResult} = require("express-validator");
 
-exports.getRegisterUser = asyncHandler( async (req,res,next)=>{
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+
+
+//REGISTER
+
+exports.getRegisterUser = (req,res,next)=>{
   res.render("register_form",{
     title: "Register!"
   })
-});
+};
 
 exports.postRegisterUser = [
   body("first_name")
@@ -47,31 +54,123 @@ exports.postRegisterUser = [
 
   asyncHandler(async (req,res,next)=>{
     const validationErrors = validationResult(req);
+    //console.log(validationErrors.array());
 
-    const user = new User({
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      is_member: false
-    });
-    console.log('after dec');
-
-    if (!validationErrors.isEmpty()){
-      console.log('fail');
-      res.render("register_form",{
-        title: "Register!",
-        user: user,
-        errors: validationErrors.array()
-      });
-    }
-    else{
-      console.log("else");
-      const savedUser = await user.save();
-      console.log(savedUser);
-      res.redirect('/user/register');
-    }
-
+    bcrypt.hash(req.body.password,10, async (err,hashedPassword)=>{
+      if(err){
+        return next(err)
+      }
+      try{
+        const newUser = new User({
+          first_name:req.body.first_name,
+          last_name: req.body.last_name,
+          username: req.body.username,
+          email: req.body.email,
+          password: hashedPassword,
+          is_member: false
+        });
+        if(!validationErrors.isEmpty()){
+          res.render("register_form",{
+            title: "Sign Up!",
+            user: newUser,
+            errors: validationErrors.array()
+          });
+        }
+        else{
+          const savedUser = await newUser.save();
+          console.log(savedUser);
+          res.redirect('/user/register')
+        }
+      }catch(err2){
+        return next(err2);
+      }
+    })
   })
-]
+];
+
+//LOGIN
+
+exports.getLoginUser = (req,res,next)=>{
+  res.render("login_form",{
+    title: "Log In!"
+  });
+};
+
+passport.use(new LocalStrategy({
+  usernameField: 'username',
+  passwordField: 'password'
+  },
+  async (username,password,done)=>{
+    try {
+      const targetUser = await User.findOne({username});
+
+      if(!targetUser){
+        return done(null,false,{message: "Incorrect username"});
+      }
+      const isPasswordMatch = await bcrypt.compare(password, targetUser.password);
+
+      if(!isPasswordMatch){
+        return done(null,false,{message: "Incorrect password"});
+      }
+
+      return done(null, targetUser);
+    }catch(err){
+      return done(err);
+    }
+  }
+));
+
+passport.serializeUser((user,done)=>{
+  done(null,user.id)
+});
+
+passport.deserializeUser(async (id,done)=>{
+  try{
+    const user = await User.findById(id);
+    done(null,user);
+  }catch(err){
+    done(err);
+  }
+})
+
+exports.postLoginUser = passport.authenticate('local',{
+  successRedirect: '/user/join',
+  failureRedirect: '/login',
+  failureFlash:true
+})
+
+// LOGOUT
+
+exports.getLogoutUser = (req,res,next)=>{
+  res.render("logout_form");
+}
+
+exports.postLogoutUser = (req,res,next)=>{
+  req.logout((err)=>{
+    if(err){
+      return next(err);
+    }
+    res.redirect("/")
+  })
+}
+
+//JOIN
+
+exports.getJoinUser = (req,res,next)=>{
+  //console.log(res.locals.currentUser);
+  res.render("join_form",{
+    username: res.locals.currentUser.username
+  })
+};
+
+exports.postJoinUser = asyncHandler(async (req,res,next)=>{
+  if(req.body.passcode != "give me the formuoli"){
+    res.render("join_form",{
+      title: "Join The Club!",
+      error: 'Wrong Passcode! I guess ur not k00l enough. sorry.'
+    })
+  }
+  else{
+    res.send('ur in');
+  }
+})

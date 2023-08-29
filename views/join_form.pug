@@ -1,0 +1,13 @@
+extends layout 
+
+block content 
+  h1 Join The Club, #{username} !
+
+  form(method='POST' action='')
+    .form-group
+      label(for='passcode') Passcode: 
+      input#passcode.form-control(type='text' name='passcode' required='true')
+    button.btn.btn-primary(type='submit') Join
+  
+  if error
+    p=error
