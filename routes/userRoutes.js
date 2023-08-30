@@ -59,11 +59,30 @@ router.get("/join", (req,res,next)=>{
     //res.send("You must be logged in to join the club");
     res.redirect('/user/login');
   }
+  else if(req.user.is_member){
+    res.redirect('/');
+  }
   else{
   userController.getJoinUser(req,res,next);
   }
 });
 
 router.post("/join", userController.postJoinUser);
+
+//BECOME AN ADMIN
+
+router.get("/admin",(req,res,next)=>{
+  if(!req.isAuthenticated()){
+    res.redirect("/user/login");
+  }
+  else if(req.user.is_admin){
+    res.redirect('/');
+  }
+  else{
+    userController.getBecomeAdmin(req,res,next);
+  }
+});
+
+router.post("/admin", userController.postBecomeAdmin);
 
 module.exports = router;

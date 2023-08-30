@@ -39,7 +39,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 app.use((req,res,next)=>{
-  //console.log(req.user);
+  console.log(req.user);
   console.log(req.isAuthenticated());
   res.locals.currentUser = req.user;
   next();
@@ -49,7 +49,7 @@ app.use(express.static(path.join(__dirname,'public')));
 
 
 app.use("/user",userRoutes);
-app.use("messages",messageRoutes);
+app.use("/messages",messageRoutes);
 app.use("/", indexRoutes);
 //app.use('*',(req,res)=> res.redirect('/messaages'));
 

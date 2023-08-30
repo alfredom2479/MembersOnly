@@ -1,0 +1,47 @@
+extends layout
+
+block content
+  h1 Messages 
+  if user
+    h2 
+      em= (user.is_member ? "Only you and other members can see who sent which messages" : "Become a member to find out who sent these messages and when")
+
+    a(href="/messages/newmessage") Post a message
+    if !user.is_member
+      |
+      br
+      a(href="/user/join") Become a member
+    br
+    a(href="/user/logout") Sign Out 
+  else 
+    h2 
+      em= "Log In or Sign Up to post a message!"
+    a(href="/user/login") Log In
+    br
+    a(href="/user/register") Sign Up
+  
+  if user
+    each message in message_list 
+      hr
+      h3 
+        strong= (user.is_member ? message.author.username : "??????")
+      h4 
+        | &nbsp;
+        em= message.content
+      p.underline=(user.is_member ? message.createdAt_formatted : "??/??/????")
+      if user.is_admin
+        a.button(href=`/messages/delete/${message._id}`) Delete Message
+    else 
+      h3 There are no messages
+  else 
+    each message in message_list 
+      hr
+      h3
+        strong="??????"
+      h4 
+        | &nbsp;
+        em= message.content
+      p.underline="??/??/????"
+  
+    else 
+      h3 There are no messages

@@ -67,7 +67,8 @@ exports.postRegisterUser = [
           username: req.body.username,
           email: req.body.email,
           password: hashedPassword,
-          is_member: false
+          is_member: false,
+          is_admin: false
         });
         if(!validationErrors.isEmpty()){
           res.render("register_form",{
@@ -79,7 +80,7 @@ exports.postRegisterUser = [
         else{
           const savedUser = await newUser.save();
           console.log(savedUser);
-          res.redirect('/user/register')
+          res.redirect('/user/login')
         }
       }catch(err2){
         return next(err2);
@@ -134,9 +135,8 @@ passport.deserializeUser(async (id,done)=>{
 })
 
 exports.postLoginUser = passport.authenticate('local',{
-  successRedirect: '/user/join',
-  failureRedirect: '/login',
-  failureFlash:true
+  successRedirect: '/',
+  failureRedirect: '/user/login'
 })
 
 // LOGOUT
@@ -167,10 +167,42 @@ exports.postJoinUser = asyncHandler(async (req,res,next)=>{
   if(req.body.passcode != "give me the formuoli"){
     res.render("join_form",{
       title: "Join The Club!",
+      username: res.locals.currentUser.username,
       error: 'Wrong Passcode! I guess ur not k00l enough. sorry.'
     })
   }
   else{
-    res.send('ur in');
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {is_member:true}, 
+    );
+    console.log(updatedUser);
+    res.redirect("/");
+  }
+})
+
+//BECOME ADMIN 
+
+exports.getBecomeAdmin = (req,res,next)=>{
+  res.render("admin_form",{
+    username: res.locals.currentUser.username
+  });
+};
+
+exports.postBecomeAdmin = asyncHandler(async (req,res,next)=>{
+  console.log(req.body.passcode)
+  if(req.body.passcode != "pretty please"){
+    res.render("admin_form",{
+      username: res.locals.currentUser.username,
+      error: "Wrong Passcode. No admin powers 4 u"
+    });
+  }
+  else{
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {is_admin: true}
+    );
+    console.log(updatedUser);
+    res.redirect("/");
   }
 })

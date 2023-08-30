@@ -9,7 +9,8 @@ const userSchema = mongoose.Schema({
   username: {type: String, require: true},
   email: {type: String, require: true},
   password: {type:String, requie: true},
-  is_member: {type: Boolean, require: true}
+  is_member: {type: Boolean, require: true},
+  is_admin: {type: Boolean}
 })
 
 module.exports = mongoose.model('User',userSchema);

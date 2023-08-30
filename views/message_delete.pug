@@ -1,0 +1,13 @@
+extends layout 
+
+block content 
+  h1 Are you sure you want to delete #{message.author.username} 's message?:
+  h2
+    em= message.content
+  p.underline= message.createdAt_formatted
+
+  form(method='POST' action='')
+    div.form-group
+      input#messageid.form-control(type='hidden' name='messageid' required='true' value=message._id)
+
+    button.btn.btn-primary(type='submit') Delete
