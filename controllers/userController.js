@@ -54,7 +54,6 @@ exports.postRegisterUser = [
 
   asyncHandler(async (req,res,next)=>{
     const validationErrors = validationResult(req);
-    //console.log(validationErrors.array());
 
     bcrypt.hash(req.body.password,10, async (err,hashedPassword)=>{
       if(err){
@@ -79,7 +78,6 @@ exports.postRegisterUser = [
         }
         else{
           const savedUser = await newUser.save();
-          console.log(savedUser);
           res.redirect('/user/login')
         }
       }catch(err2){
@@ -157,7 +155,6 @@ exports.postLogoutUser = (req,res,next)=>{
 //JOIN
 
 exports.getJoinUser = (req,res,next)=>{
-  //console.log(res.locals.currentUser);
   res.render("join_form",{
     username: res.locals.currentUser.username
   })
@@ -176,7 +173,6 @@ exports.postJoinUser = asyncHandler(async (req,res,next)=>{
       req.user._id,
       {is_member:true}, 
     );
-    console.log(updatedUser);
     res.redirect("/");
   }
 })
@@ -190,7 +186,6 @@ exports.getBecomeAdmin = (req,res,next)=>{
 };
 
 exports.postBecomeAdmin = asyncHandler(async (req,res,next)=>{
-  console.log(req.body.passcode)
   if(req.body.passcode != "pretty please"){
     res.render("admin_form",{
       username: res.locals.currentUser.username,
@@ -202,7 +197,6 @@ exports.postBecomeAdmin = asyncHandler(async (req,res,next)=>{
       req.user._id,
       {is_admin: true}
     );
-    console.log(updatedUser);
     res.redirect("/");
   }
 })

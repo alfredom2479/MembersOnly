@@ -20,7 +20,6 @@ exports.postCreateMessage = [
     const validationErrors = validationResult(req);
 
     if(!req.isAuthenticated()){
-      console.log('no user!')
       res.send("Must be logged in to send a message");
     }
 
@@ -36,9 +35,7 @@ exports.postCreateMessage = [
       });
     }
     else{
-      console.log("about to save msg")
       const savedMessage = await newMessage.save();
-      console.log(savedMessage);
       res.redirect('/');
     }
   })
@@ -47,8 +44,6 @@ exports.postCreateMessage = [
 exports.getAllMessages = asyncHandler( async(req,res,next) =>{
   
   allMessages = await Message.find().populate("author");
-  console.log(allMessages);
-  console.log('caf: '+allMessages[0].createdAt_formatted)
 
   res.render("message_list",{
     user: req.user,
