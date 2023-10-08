@@ -1,6 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
 const debug = require("debug")("test");
+const compression = require("compression");
+const helmet = require("helmet");
 
 const errorHandler = require("./middleware/errorMiddleware");
 const connectDB = require("./config/db");
@@ -20,6 +22,15 @@ connectDB();
 debug("MONGODB is set");
 
 const app = express();
+
+//normally just use app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -48,12 +59,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// add compresssion for more faster responses
+// AKA: X-Games mode
+app.use(compression());
+
+//Research what this is for bc u forgot u big dummie
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/user", userRoutes);
 app.use("/messages", messageRoutes);
 app.use("/", indexRoutes);
-//app.use('*',(req,res)=> res.redirect('/messaages'));
 
 app.use(passport.initialize());
 app.use(errorHandler);
