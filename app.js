@@ -3,6 +3,7 @@ const dotenv = require("dotenv").config();
 const debug = require("debug")("test");
 const compression = require("compression");
 const helmet = require("helmet");
+const RateLimit = require("express-rate-limit");
 
 const errorHandler = require("./middleware/errorMiddleware");
 const connectDB = require("./config/db");
@@ -19,10 +20,10 @@ const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 
 connectDB();
-debug("MONGODB is set");
 
 const app = express();
 
+//safety first!
 //normally just use app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({
@@ -31,6 +32,13 @@ app.use(
     },
   })
 );
+
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+});
+
+app.use(limiter);
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
